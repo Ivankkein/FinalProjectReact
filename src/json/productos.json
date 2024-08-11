@@ -1,0 +1,25 @@
+[
+    {"id": 1,
+      "name": "Mortal Kombat 1",
+      "price": 80000,
+      "description": "Mortal Kombat 1 for the PS5",
+      "image": "https://acdn.mitiendanube.com/stores/823/550/products/1-64db28b9c26b27462717068256195611-1024-1024.jpg",
+      "category": "ps5"
+    },
+    {
+      "id":2,
+      "name": "Final Fantasy VII Rebirth",
+      "price": 90000,
+      "description": "Final Fantasy VII Rebirth for the PS5",
+      "image": "https://media.vandal.net/m/121125/final-fantasy-vii-rebirth-202212217442298_1.jpg",
+      "category": "ps5"
+    },
+    {"id":3,
+      "name": "Pokemon Shield",
+      "price": 70000,
+      "description": "Pokemon Shield for the Nintendo Switch",
+      "image": "https://www.rpgfan.com/wp-content/uploads/2020/06/Pokemon-Shield-Cover-Art.jpg",
+      "category": "switch"
+    }
+
+  ]
