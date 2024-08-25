@@ -5,11 +5,19 @@ const ItemCount = ({ onChange }) => {
   const [quantity, setQuantity] = useState(1);
   
 
-  const handleIncrement = () => setQuantity(quantity + 1); onChange(quantity + 1);
-  const handleDecrement = () => {const newQuantity = Math.max(quantity - 1, 1);
+  const handleIncrement = () => {
+    const newQuantity = quantity + 1;
     setQuantity(newQuantity);
     onChange(newQuantity);
   };
+
+  const handleDecrement = () => {
+    const newQuantity = Math.max(quantity - 1, 1);
+    setQuantity(newQuantity);
+    onChange(newQuantity);
+  };
+
+
   
   
 

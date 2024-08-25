@@ -1,17 +1,16 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { useParams, useNavigate} from 'react-router-dom';
-import arrayProductos from '../json/productos.json';
+import { useParams, useNavigate } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
 import ItemCount from './ItemCount';
-
+import { doc, getDoc, getFirestore } from "firebase/firestore";
+import {db } from "../main"
 
 const ItemDetail = () => {
-  const { categoryId, itemId } = useParams();
-  const items = arrayProductos.find(item => item.id === parseInt(itemId));
+  const { itemId } = useParams();
   const [item, setItem] = useState(null);
   const [quantity, setQuantity] = useState(0);
   const { addItem, isInCart } = useContext(CartContext);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const handleAddToCart = (quantity) => {
     if (item) {
@@ -22,25 +21,27 @@ const ItemDetail = () => {
 
   const handlePurchase = () => {
     if (quantity > 0) {
-      
-      navigate('checkout');
-      
+      navigate('/cart');
     }
   };
 
   useEffect(() => {
-    const fetchItem = () => {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(arrayProductos.find(item => item.id === parseInt(itemId, 10)));
-        }, 1000);
-      });
+    const fetchItem = async () => {
+      const db = getFirestore();
+      const docRef = doc(db, "items", itemId);
+      const docSnap = await getDoc(docRef);
+      
+      if (docSnap.exists()) {
+        setItem({ id: docSnap.id, ...docSnap.data() });
+      } else {
+        setItem(null);
+      }
     };
 
-    fetchItem().then(data => setItem(data));
+    fetchItem();
   }, [itemId]);
 
-  if (!items) {
+  if (!item) {
     return <div>Product not found</div>;
   }
 
@@ -49,17 +50,17 @@ const ItemDetail = () => {
       <div className="row">
         <div className="col">
           <div className="card">
-            <img src={items.image} className="card-img-top" alt={items.name} />
+            <img src={item.image} className="card-img-top" alt={item.name} />
             <div className="card-body">
-              <h5 className="card-title">{items.name}</h5>
-              <p className="card-text">{items.price}</p>
-              <p>{items.description}</p>
-              <ItemCount/>
+              <h5 className="card-title">{item.name}</h5>
+              <p className="card-text">${item.price}</p>
+              <p>{item.description}</p>
+              <ItemCount onChange={setQuantity} />
               <button 
                 onClick={() => handleAddToCart(quantity)} 
-                disabled={isInCart(items.id)}
+                disabled={isInCart(item.id)}
               >
-                {isInCart(items.id) ? "En el carrito" : "Comprar"}
+                {isInCart(item.id) ? "En el carrito" : "Comprar"}
               </button>
               {quantity > 0 && (
                 <button 

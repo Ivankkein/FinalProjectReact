@@ -1,19 +1,25 @@
 import { useEffect, useState, useContext } from "react";
-import arrayProductos from "../json/productos.json"
 import { useParams, Link, useNavigate } from "react-router-dom";
+import { collection, getDocs, getFirestore, query, where } from "firebase/firestore";
 import ItemCount from "./ItemCount";
 import { CartContext } from '../context/CartContext';
 
 const ItemListContainer = () => {
-    const [item, setItem] = useState(arrayProductos);
+    const [items, setItems] = useState([]);
     const { id } = useParams();
     const { addItem, isInCart, cartItems } = useContext(CartContext);
     const [selectedQuantity, setSelectedQuantity] = useState(1);
     const navigate = useNavigate();
     
-
     useEffect(() => {
-        setItem(id ? arrayProductos.filter(item => item.category == id) : arrayProductos)
+        const db = getFirestore();
+        const itemsCollection = collection(db, "items");
+        const q = id ? query(itemsCollection, where("category", "==", id)) : itemsCollection;
+
+        getDocs(q).then((snapshot) => {
+            const fetchedItems = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+            setItems(fetchedItems);
+        });
     }, [id]);
 
     const handleAddToCart = (item) => {
@@ -24,40 +30,37 @@ const ItemListContainer = () => {
         setSelectedQuantity(quantity);
     };
 
-    
-    
-
     const handlePurchase = () => {
-        if (cartItems.length > 0) { navigate('checkout');
+        if (cartItems.length > 0) {
+            navigate('/cart');
         }
     }
 
     return (
         <div className="container">
-            <div key={item.id} className="row">
-                {item.map(item => (
-                    <div className="col">
-                        <div class="card">
-                        <Link to={`/category/${item.category}/${item.id}`}>
-                            <img src={item.image} class="card-img-top" alt={item.name} />
+            <div className="row">
+                {items.map(item => (
+                    <div key={item.id} className="col">
+                        <div className="card">
+                            <Link to={`/category/${item.category}/${item.id}`}>
+                                <img src={item.image} className="card-img-top" alt={item.name} />
                             </Link>
-                            <div class="card-body">
-                                <h5 class="card-title">{item.name}</h5>
-                                <p class="card-text">{item.price}</p>
+                            <div className="card-body">
+                                <h5 className="card-title">{item.name}</h5>
+                                <p className="card-text">${item.price}</p>
                                 <p>{item.description}</p>
                                 <ItemCount onChange={handleQuantityChange} />
-                                {<button 
+                                <button 
                                     onClick={() => handleAddToCart(item)} 
                                     disabled={isInCart(item.id)}
                                 >
                                     {isInCart(item.id) ? "En el carrito" : "Agregar al carrito"}
-                                </button>}
+                                </button>
                             </div>
                         </div>
                     </div>
                 ))}
-
-</div>
+            </div>
             {cartItems.length > 0 && (
                 <div className="checkout-button-container">
                     <button 
@@ -66,8 +69,11 @@ const ItemListContainer = () => {
                     >
                         Terminar mi compra
                     </button>
+                    
                 </div>
             )}
-        </div>)}
+        </div>
+    );
+}
 
-export default ItemListContainer
+export default ItemListContainer;
