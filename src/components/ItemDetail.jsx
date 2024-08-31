@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { CartContext } from '../context/CartContext';
 import ItemCount from './ItemCount';
 import { doc, getDoc, getFirestore } from "firebase/firestore";
-import {db } from "../main"
+import { db } from '../main';
 
 const ItemDetail = () => {
   const { itemId } = useParams();
